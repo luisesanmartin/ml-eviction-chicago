@@ -11,6 +11,12 @@ from sklearn.metrics import roc_curve
 
 def get_predictions(classifier, X_test):
     '''
+    Returns a Pandas Series with the prediction scores.
+
+    Inputs:
+        - classifier object
+        - X_test: test dataset (Pandas)
+    Output: Pandas series with the prediction scores
     '''
 
     if hasattr(classifier, 'predict_proba'):
