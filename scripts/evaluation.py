@@ -163,3 +163,60 @@ def evaluation_table(classifiers, X_test, y_test):
     df['auc_roc'] = auc_values
     
     return df
+
+
+def evaluation_table2(classifiers, X_datasets, y_test):
+    '''
+    Please notice that this function might take a while to run
+    The difference between this function and evaluation_table is that
+    in this each X set can be different, while evaluation_table uses the
+    same X set for all the classifiers.
+    Also, each X set is a one-feature pandas Series
+    '''
+
+    df = pd.DataFrame()
+    fractions = [0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5]
+
+    df['classifier'] = classifiers
+    df['features'] = [X.name for X in X_datasets]
+    df['baseline'] = [simple_classifier(y_test)]*len(df)
+
+    sorted_predictions = []
+    for i, classifier in enumerate(classifiers):
+        sorted_predictions.append(get_predictions(classifier, \
+            X_datasets[i].values.reshape(-1, 1)))
+
+    for metric in ['precision', 'recall']:
+        
+        for fraction in fractions:
+
+            l = []
+            i = 0
+
+            for num, classifier in enumerate(classifiers):
+
+                pred_scores = sorted_predictions[i]
+                threshold = pred_scores.quantile(1 - fraction)
+
+                if metric == 'precision':
+
+                    l.append(precision(classifier, threshold, \
+                        X_datasets[num].values.reshape(-1, 1), y_test))
+
+                else:
+
+                    l.append(recall(classifier, threshold, \
+                        X_datasets[num].values.reshape(-1, 1), y_test))
+
+                i += 1
+
+            col_name = metric + '_' + str(fraction)
+            df[col_name] = l
+
+    auc_values = []
+    for num, classifier in enumerate(classifiers):
+        auc_values.append(area_under_curve(classifier, \
+            X_datasets[num].values.reshape(-1, 1), y_test))
+    df['auc_roc'] = auc_values
+    
+    return df
