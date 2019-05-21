@@ -8,7 +8,7 @@ from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import AdaBoostClassifier
 
 
-def boosting(features, label, n=10):
+def boosting(features, label, n=100):
 	'''
 	'''
 
@@ -30,7 +30,7 @@ def bagging(features, label, n=10, samples=0.2, features_size=1/3):
 	return bagging
 
 
-def random_forest(features, label, n=10, \
+def random_forest(features, label, n=1000, \
 	features_size='auto', criteria='gini'):
 	'''
 	'''

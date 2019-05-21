@@ -125,6 +125,7 @@ def evaluation_table(classifiers, X_test, y_test):
     fractions = [0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5]
 
     df['classifier'] = classifiers
+    df['features'] = X_test.columns
     df['baseline'] = [simple_classifier(y_test)]*len(df)
 
     sorted_predictions = []
