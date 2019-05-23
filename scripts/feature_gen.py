@@ -1,8 +1,120 @@
+'''
+FEATURE GENERATION
+Functions to generate new features from raw data attributes
+'''
+
+#### Stil a lot of to-dos / not done
+
+import os
+import sys
+from sys import version_info
 import pandas as pd
 import numpy as np
 
-features = ['poverty-rate', 'median-gross-rent', 'median-household-income', 'median-property-value]
-years = [2012, 2013, 2014, 2015, 2016]
+
+#############################
+# READ AND PRE-PROCESS DATA #
+#############################
+
+def initial_read(csv_file, prompts=False):
+    '''
+    Read in first 10 rows of file to extract auto-datatypes,
+    Allow user to specify column data types if desired.
+
+    INPUT: csv_file (str) -- path to the csv file to open
+        prompts (bool) -- if user wants to see prompts to specify datatypes
+
+    OUTPUT: Prints column names with their automated datatypes
+            Asks if user wants to specify datatypes of columns
+            Returns None or a dataframe
+    '''
+
+    if not os.path.exists(csv_file):
+        print("Cannot find file or file does not exist")
+        return None
+
+    col_types = {}
+    if prompts:
+        response = user_input("Would you like to see column names and auto-datatypes from this data (y/n)?")
+        if response == 'y':
+            df = pd.read_csv(csv_file, nrows=10)
+            print(df.dtypes)
+
+        response = user_input("Would you like to change some or all of the column datatypes (y/n)?")
+        # dtype will not error if dict contains colnames that  do not exist in data; no need to check
+        if response == 'y':
+            col_types = specify_coltypes()
+
+    df = read_process_data(csv_file, col_types)
+    return df
+
+
+def user_input(prompt):
+    '''
+    Code for prompting user input at command line. 
+    **EXPECTS y OR n FOR USER RESPONSE.**
+
+    INPUT: prompt/question (str)
+    OUTPUT: user response (str)
+    '''
+    # Code for version check by Chris Simpkins from:
+    # http://sweetme.at/2014/01/22/how-to-get-user-input-from-the-command-line-in-a-python-script/
+    py3 = version_info[0] > 2 #creates boolean value for test that Python major version > 2
+    if py3:
+        response = input(prompt)
+    else:
+        response = raw_input(prompt)
+
+    if response not in ['y', 'n']:
+        print("Not a valid response. Please enter y or n.")
+        response = user_input(prompt)
+    return response
+
+
+def specify_coltypes():
+    '''
+    Have user specify the datatypes of passed atrributes/columns
+    Function call prints prompts for user to enter colnames and coltypes (str)
+
+    OUTPUT: mapping of attribute names to datatypes (dict)
+            e.g. col_types = {'age': 'int', 'name': 'str'}
+    '''
+    print("Please specify which attributes you would like to change using the following format:")
+    print("<colname1> <coltype1>\n<colname2> <coltype2>")
+    print("Enter Ctrl+D when you are finished")
+
+    # inspired by https://stackoverflow.com/questions/14147369/make-a-dictionary-in-python-from-input-values
+    col_types = dict(col_map.split() for col_map in sys.stdin.read().splitlines())
+    return col_types
+
+
+def read_process_data(csv_file, col_types=None):
+    '''
+    Purpose: Read in and process csv
+
+    Inputs: csv_file (string) -- path to the csv file to open
+            col_types (dict) -- mapping of attribute names to datatypes
+
+    Returns: (dataframe) -- a pre-processed dataframe
+    '''
+    if not col_types:
+        df = pd.read_csv(csv_file)
+    else:
+        df = pd.read_csv(csv_file, dtype=col_types)
+
+    fill_dict = {}
+    # Select columns whose datatypes are numerical (e.g. int, float, etc.)
+    numeric_cols_df = df.select_dtypes(include=['number'])
+    for attribute in numeric_cols_df.columns:
+        fill_dict[attribute] = numeric_cols_df[attribute].median()
+
+    df.fillna(fill_dict, inplace=True)
+    return df
+
+
+##################################
+# GENERATE FEATURES & PREDICTORS #
+##################################
 
 def create_dummies(df, col_list):
     '''
@@ -111,6 +223,45 @@ First adds a feature that cuts columns by quantiles (4 for quartiles, 5 for quan
 Then further adds dummies/binary variables for each quantile.
 '''
 
+
+
+
+
+
+
+#########################
+# RUN FROM COMMAND LINE #
+#########################
+
+def go():
+    '''
+    Call script from command line
+    '''
+    usage = "Usage: python feature_gen.py <data filename> <prompts>\n" \
+             "<data filename> is csv filename (str) of data to be processed.\n" \
+             "<prompts>: Type true if you want to see column names and/or specify datatypes.\n" \
+             "Type false if you want to automatically download and process data without prompts."
+
+    num_args = len(sys.argv)
+    args = sys.argv
+
+    if num_args < 3:
+        print(usage)
+        sys.exit(1)
+    elif args[2].lower() not in ['true', 'false']:
+        print(usage)
+        sys.exit(1)
+    elif args[2].lower() == 'true':
+        df = initial_read(args[1], prompts=True)
+    else:
+        df = initial_read(args[1], prompts=False)
+
+    if df is not None:
+        # UNIQUE SET OF COMMANDS SPECIFIC TO PROJECT
+        features = ['poverty-rate', 'median-gross-rent', 'median-household-income', 'median-property-value]
+        years = [2012, 2013, 2014, 2015, 2016]
+        
+        
 
 
 
