@@ -253,13 +253,22 @@ def create_categorical_quantiles(df, q, colname, suffix=None):
 # Z-SCORE GENERATION #
 ######################
 '''
-This section creates new features for desired quantiles of existing data features.
+This section creates new features that assign z-scores to each row, given an attribute.
+Create a list of data features that you want to scale, and loop over each to generate features.
 
-Create a list of data features that you want to cut, and loop over each to generate features.
-First adds a feature that cuts columns by quantiles (4 for quartiles, 5 for quantiles, etc.).
-Then further adds dummies/binary variables for each quantile.
+Z-score = row value - mean / standard deviation
 '''
 
+
+#######################
+# NORMALIZED FEATURES #
+#######################
+'''
+This section creates new features that assign normalized scores to each row, given an attribute.
+Create a list of data features that you want to scale, and loop over each to generate features.
+
+Normalization = row value - min / (max-min)
+'''
 
 
 
