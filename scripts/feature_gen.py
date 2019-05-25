@@ -15,7 +15,6 @@ import numpy as np
 #############################
 # READ AND PRE-PROCESS DATA #
 #############################
-
 def initial_read(csv_file, prompts=False):
     '''
     Read in first 10 rows of file to extract auto-datatypes,
@@ -28,7 +27,6 @@ def initial_read(csv_file, prompts=False):
             Asks if user wants to specify datatypes of columns
             Returns None or a dataframe
     '''
-
     if not os.path.exists(csv_file):
         print("Cannot find file or file does not exist")
         return None
@@ -115,7 +113,6 @@ def read_process_data(csv_file, col_types=None):
 ##################################
 # GENERATE FEATURES & PREDICTORS #
 ##################################
-
 def create_dummies(df, col_list):
     '''
     Transform cols to binary to prepare for modeling
@@ -134,66 +131,89 @@ def create_dummies(df, col_list):
 ########################
 '''
 This section creates new features for desired quantiles of existing data features.
-
-Create a list of data features that you want to cut, and loop over each to generate features.
+Create a list of raw attributes to cut, and this section will loop over each to generate features.
 First adds a feature that cuts columns by quantiles (4 for quartiles, 5 for quantiles, etc.).
-Then further adds dummies/binary variables for each quantile.
+Then further adds dummies/binary variables for each quantile category generated.
 '''
-q = 5 # quartiles: q=4, quintiles: q=5
-
-def generate_quantile_year_var(df, features_list, q, year_vars=None):
+def generate_quantile_features(df, attributes_list, q, year_vars=None):
     '''
-    year_vars: (list) year values by which to vary quantile categories
-    '''
-
-    if year_vars is None:
-        generate_quantile_dummies(df, features_list, q)
-    else:
-        assert isinstance(year_vars, list), "year_var must be None or a list of year values"
-        extract_years(df, year_vars, features_list)
-
-
-def extract_years(df, years_list, features_list):
-    '''
-    Extract list of years from dataframe for time-varying feature generation
-    '''
-    #df[df['year'].isin([2013])]
-    for yr in years_list:
-        # create a df with only the given yr and only with the columns in col_list
-        only_yr_df = df[df['year'] == yr][features_list]
-        only_yr_df_w_quants = generate_quantile_dummies(only_yr_df, features_list, q)
-        # have to drop so that won't get duplicates when merged again with original datafarme
-        only_yr_df_w_quants.drop(columns=features_list, inplace=True)
-
-        # to do: still need to generate quantiles and dummies on these time vars
-        # to do: then need to somehow append columns to overall df
-        # to do: note that before appending, columns in features_list will have duplicates unles dropped
-
-
-def generate_quantile_dummies(df, features_list, q):
-    '''
-    Loop over features list, and create new quantile feature and quantile dummies from each.
+    If want to create quantiles varied by the specified years in year_vars, will first extract those 
+    years and determine value quantiles only within those years/year ranges.
+    Then (or otherwise), creates categorical and dummy variables from quantiles over whole dataset
     
-    INPUT: dataframe (pandas df), features_list: features to loop over (list), q: (int)
+    INPUT:
+    - dataframe to cut (df), attributes to cut (list), number of quantiles (q=int)
+    - year_vars is a list of values or tuples indicating range of years (inclusive) by which to
+    vary quantiles (e.g. year_vars = [2013, (2014, 2016), 2017])
+    
+    OUTPUT:
+    - dataframe with a feature for quantiles (as categories) and dummy features for those categories;
+    quantiles are calculated for each raw attribute in the attributes_list
+    '''
+    year_var_usage = 'year_vars must be a list of values or tuples indicating range of years (inclusive) \
+        by which to vary quantiles (e.g. year_vars = [2013, (2014, 2016), 2017])'
+    if year_vars:
+        assert isinstance(year_vars, list), year_var_usage
+        df = extract_quantiles_by_year(df, attributes_list, q, year_vars)
+    df = generate_quantiles_and_dummies(df, attributes_list, q)
+    return df
+
+
+def extract_quantiles_by_year(df, attributes_list, q, years_list):
+    '''
+    Extract quantiles from each year/year-range listed in years_list
+    This function allows for time-varying feature generation
+
+    INPUT:
+    - dataframe to cut (df), attributes to cut (list), number of quantiles (q=int)
+    - years_list is a list of values (int) or tuples indicating range of years (inclusive) by which to
+    vary quantiles (e.g. year_vars = [2013, (2014, 2016), 2017])
+    
+    OUTPUT:
+    - dataframe with a feature for quantiles (as categories) and dummy features for those categories;
+    quantiles are calculated from each year/year-range and for each raw attribute in the attributes_list
+    '''
+    for yr in years_list:
+        # create a df with only the given yr or range of years and only with the columns in attributes_list
+        if isinstance(yr, tuple):
+            only_yr_df = df[df['year'].isin(yr)][attributes_list]
+        elif isinstance(yr, int):
+            only_yr_df = df[df['year'] == yr][attributes_list]
+        else:
+            raise TypeError('values for years_list must be int type or tuples')
+        
+        only_yr_df_w_quants = generate_quantiles_and_dummies(only_yr_df, attributes_list, q)
+        # drop cols in attributes_list to avoid duplicates when merged again with original dataframe
+        only_yr_df_w_quants.drop(columns=attributes_list, inplace=True)
+        # merge with main df; code below will match on index and fill NaNs for non-yr rows
+        df = df.merge(only_yr_df_w_quants, how='outer', left_index=True, right_index=True)
+    return df
+
+
+def generate_quantiles_and_dummies(df, attributes_list, q):
+    '''
+    Loop over attributes list, and create new quantile feature and quantile dummies from each
+    
+    INPUT: dataframe (pandas df), attributes_list: features to loop over (list of str), q: (int)
     OUTPUT: dataframe with generated features (pandas df)
     '''
     quantile_features = []
-    for feature in features_list:
-        quant_feat = create_quantiles_feature(df, q, feature)
-        quantile_features.append(quant_feat)
+    for attribute in attributes_list:
+        # create_categorical_quantiles modifies df, but returns the colname of new feature
+        quant_feat_colname = create_categorical_quantiles(df, q, attribute)
+        quantile_features.append(quant_feat_colname)
 
     # When creating dummies, original column gets dropped
     # So instead copy feature and use original for creating dummies
     for quant_feat in quantile_features:
         feature_copy = quant_feat + '_categorical'
         df[feature_copy] = df[quant_feat]
-
     # Use original feature for dummies (since dummies will be named based on original)
     df = create_dummies(df, quantile_features)
     return df
 
 
-def create_quantiles_feature(df, q, column):
+def create_categorical_quantiles(df, q, column):
     '''
     Create a new categorical feature that labels rows based on membership in a given quantile.
     
@@ -240,7 +260,8 @@ def go():
     usage = "Usage: python feature_gen.py <data filename> <prompts>\n" \
              "<data filename> is csv filename (str) of data to be processed.\n" \
              "<prompts>: Type true if you want to see column names and/or specify datatypes.\n" \
-             "Type false if you want to automatically download and process data without prompts."
+             "Type false if want to automatically download and process data without prompts.\n" \
+             "**For now, edit paramaters inside script (e.g. year variation, attributes to cut."
 
     num_args = len(sys.argv)
     args = sys.argv
@@ -258,16 +279,14 @@ def go():
 
     if df is not None:
         # UNIQUE SET OF COMMANDS SPECIFIC TO PROJECT
-        features = ['poverty-rate', 'median-gross-rent', 'median-household-income', 'median-property-value]
-        years = [2012, 2013, 2014, 2015, 2016]
-        
-        
-
-
-
-
-
-
+        features = ['poverty-rate'] #TEST
+        year_vars = [2014] #TEST
+        #features = ['poverty-rate', 'median-gross-rent', 'median-household-income', 'median-property-value]
+        #year_vars = [2012, 2013, 2014, 2015, 2016, (2012, 2015)]
+        # if want quartiles: q=4, quintiles: q=5, deciles q=10
+        q = 5
+        df = generate_quantile_features(df, features, q, year_vars)
+        return df
 
 
 
