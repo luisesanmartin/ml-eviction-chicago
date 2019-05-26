@@ -29,6 +29,12 @@ def get_predictions(classifier, X_test):
 
 def simple_classifier(y_test):
     '''
+    Returns a float number with the accuracy if we just predicted every
+    value in the test set to be 1/0, whatever fraction is higher in y_test.
+
+    Inputs:
+        y_test: Pandas series with the test label
+    Output: accuracy of this simple classifier method
     '''
 
     mean = y_test.mean()
@@ -49,6 +55,15 @@ def simple_classifier(y_test):
 
 def accuracy(classifier, threshold, X_test, y_test):
     '''
+    Returns the accuracy (float) of a classifier given a certain threshold,
+    and a certain test set (X_test and y_test).
+
+    Inputs:
+        - classifier: the model we are using
+        - threshold: the threshold we use to calculate accuracy
+        - X_test: a Pandas dataframe with the features of the test set
+        - y_test: a Pandas series with the label of the test set
+    Output: accuracy (float)
     '''
 
     pred_scores = get_predictions(classifier, X_test)
@@ -60,6 +75,15 @@ def accuracy(classifier, threshold, X_test, y_test):
 
 def precision(classifier, threshold, X_test, y_test):
     '''
+    Returns the precision (float) of a classifier given a certain
+    threshold, and a certain test set (X_test and y_test).
+
+    Inputs:
+        - classifier: the model we are using
+        - threshold: the threshold we use to calculate precision
+        - X_test: a Pandas dataframe with the features of the test set
+        - y_test: a Pandas series with the label of the test set
+    Output: precision (float)
     '''
 
     pred_scores = get_predictions(classifier, X_test)
@@ -73,6 +97,15 @@ def precision(classifier, threshold, X_test, y_test):
 
 def recall(classifier, threshold, X_test, y_test):
     '''
+    Returns the recall (float) of a classifier given a certain
+    threshold, and a certain test set (X_test and y_test).
+
+    Inputs:
+        - classifier: the model we are using
+        - threshold: the threshold we use to calculate recall
+        - X_test: a Pandas dataframe with the features of the test set
+        - y_test: a Pandas series with the label of the test set
+    Output: recall (float)
     '''
 
     pred_scores = get_predictions(classifier, X_test)
@@ -86,6 +119,15 @@ def recall(classifier, threshold, X_test, y_test):
 
 def f1(classifier, threshold, X_test, y_test):
     '''
+    Returns the f1 score (float) of a classifier given a certain
+    threshold, and a certain test set (X_test and y_test).
+
+    Inputs:
+        - classifier: the model we are using
+        - threshold: the threshold we use to calculate the f1 score
+        - X_test: a Pandas dataframe with the features of the test set
+        - y_test: a Pandas series with the label of the test set
+    Output: f1 score (float)
     '''
 
     pred_scores = get_predictions(classifier, X_test)
@@ -97,6 +139,14 @@ def f1(classifier, threshold, X_test, y_test):
 
 def area_under_curve(classifier, X_test, y_test):
     '''
+    Returns the area under the curve (float) of a classifier
+    given a certain test set (X_test and y_test).
+
+    Inputs:
+        - classifier: the model we are using
+        - X_test: a Pandas dataframe with the features of the test set
+        - y_test: a Pandas series with the label of the test set
+    Output: area under the curve (float)
     '''
 
     pred_scores = get_predictions(classifier, X_test)
@@ -108,7 +158,14 @@ def area_under_curve(classifier, X_test, y_test):
 
 def precision_recall_curves(classifier, X_test, y_test):
     '''
-    Important: This function uses code borrowed from the lab 4
+    Plots the precision and recall curves of a classifier, given a
+    certain test set.
+
+    Inputs:
+        - classifier: the model we are using
+        - X_test: a Pandas dataframe with the features of the test set
+        - y_test: a Pandas series with the label of the test set
+    Output: plot object
     '''
 
     pred_scores = get_predictions(classifier, X_test)
@@ -124,7 +181,16 @@ def precision_recall_curves(classifier, X_test, y_test):
 
 def evaluation_table(classifiers, X_test, y_test):
     '''
-    Please notice that this function might take a while to run
+    (Please notice that this function might take a while to run)
+    Returns a dataframe where each row is a classifier from classifiers
+    and each column is a model performance indicator. Each classifier
+    is evaluated on the same features and the same label.
+
+    Inputs:
+        - classifiers: a list of the classifiers we want to evaluate
+        - X_test: a Pandas dataframe with the features of the test set
+        - y_test: a Pandas series with the label of the test set
+    Output: a Pandas dataframe - the evaluation table
     '''
 
     df = pd.DataFrame()
@@ -173,11 +239,23 @@ def evaluation_table(classifiers, X_test, y_test):
 
 def evaluation_table2(classifiers, X_datasets, y_test):
     '''
-    Please notice that this function might take a while to run
+    (Please notice that this function might take a while to run)
+    Returns a dataframe where each row is a classifier from classifiers
+    and each column is a model performance indicator. The classifiers
+    must be one-feature models, and the i-th classifier from classifiers
+    is evaluated on the i-th feature from X_datasets. They all use
+    the same label (y_test).
     The difference between this function and evaluation_table is that
-    in this each X set can be different, while evaluation_table uses the
-    same X set for all the classifiers.
-    Also, each X set is a one-feature pandas Series
+    in this one each X set can be different, while evaluation_table uses the
+    same X set for all the classifiers. Also, each X set is a one-feature
+    Pandas series.
+
+    Inputs:
+        - classifiers: a list of the classifiers we want to evaluate
+        - X_datasets: a list of Pandas series with the features we want to
+                      evaluate.
+        - y_test: a Pandas series with the label of the test set
+    Output: a Pandas dataframe - the evaluation table
     '''
 
     df = pd.DataFrame()
