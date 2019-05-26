@@ -2,50 +2,34 @@ import pandas as pd
 import numpy as np
 
 
-def create_time_label(df, date_posted, date_funded):
-    '''
-    '''
-
-    days60 = pd.DateOffset(days=60)
-
-    df['funded'] = np.where(df[date_funded] <= df[date_posted] + days60, 1, 0)
-
-
-def time_based_split(df, time_col, date_threshold, months_range):
-    '''
-    '''
-
-    date_lower_threshold = pd.to_datetime(date_threshold)
-    date_upper_threshold = date_lower_threshold + \
-                           pd.DateOffset(months=months_range)
-    df_train = df[df[time_col]<=date_lower_threshold]
-    df_test = df[(df[time_col]>date_lower_threshold) \
-              & (df[time_col]<=date_upper_threshold)]
-
-    print('train/test threshold:', date_lower_threshold)
-    print('test upper threshold:', date_upper_threshold)
-
-    return df_train, df_test
-
-
 def to_date(df, column):
     '''
+    Transforms a column (column) of a dataframe (df) in date type.
+
+    Inputs:
+        - column (column of a pandas dataframe): the column whose type
+        we want to replace
+        - df: the pandas dataframe where column is
+
+    Output: nothing. Modifies the df directly.
     '''
 
     df[column] = pd.to_datetime(df[column], infer_datetime_format=True)
 
 
-def discrete_0_1(df, column, value0, value1):
-    '''
-    '''
-
-    df[column] = df[column].replace(value0, 0)
-    df[column] = df[column].replace(value1, 1)
-    df[column] = pd.to_numeric(df[column])
-
-
 def fill_nas_other(df, column, label):
     '''
+    Fills the NaN values of a column (column) in a dataframe (df) with
+    the value provided (label).
+
+    Inputs:
+        - column (column of a pandas dataframe): the column whose NaN
+        values we want to fill in. It should be a variable
+        included in df
+        - df: the pandas dataframe where column is and where we'll replace
+        the NaN values
+
+    Output: nothing. Modifies the df directly.
     '''
 
     df[column] = df[column].fillna(value=label)
@@ -53,6 +37,17 @@ def fill_nas_other(df, column, label):
 
 def fill_nas_mode(df, column):
     '''
+    Fills the NaN values of a column (column) in a dataframe (df) with
+    the value of the column mode.
+
+    Inputs:
+        - column (column of a pandas dataframe): the column whose NaN
+        values we want to fill in with the mode. It should be a variable
+        included in df
+        - df: the pandas dataframe where column is and where we'll replace
+        the NaN values
+
+    Output: nothing. Modifies the df directly.
     '''
 
     mode = df[column].mode().iloc[0]
@@ -67,9 +62,9 @@ def fill_nas_median(df, column):
     Inputs:
         - column (column of a pandas dataframe): the column whose NaN
         values we want to fill in with the median. It should be a variable
-        included in df.
+        included in df
         - df: the pandas dataframe where column is and where we'll replace
-        the NaN values.
+        the NaN values
 
     Output: nothing. Modifies the df directly.
     '''
@@ -86,9 +81,9 @@ def discretize(df, column):
 
     Inputs:
         - column (column of a pandas dataframe): the column we want to
-        discretize. It should be a continuous variable included in df.
+        discretize. It should be a continuous variable included in df
         - df: the pandas dataframe where column is and where we'll add
-        the new dummy variables.
+        the new dummy variables
 
     Output: nothing. Modifies the df directly.
     '''
@@ -115,7 +110,7 @@ def create_dummies(df, column):
 
     Inputs:
         - column (column of a pandas dataframe): the column we want to
-        discretize. It should be a categorical variable included in df.
+        discretize. It should be a categorical variable included in df
         - df: the pandas dataframe where column is and where we'll add
         the new dummy variables
     Output: nothing. Modifies the df directly.       
@@ -134,8 +129,8 @@ def replace_over_one(df, column):
 
     Inputs:
         - column (column of a pandas dataframe): the column whose values
-        over one we will replace with ones.
-        - df: the pandas dataframe where column is.
+        over one we will replace with ones
+        - df: the pandas dataframe where column is
     Output: nothing. Modifies the df directly.
     '''
 
@@ -150,8 +145,8 @@ def discretize_over_zero(df, column):
 
     Inputs:
         - column (column of a pandas dataframe): the column whose values
-        we'll take to create the dummy.
-        - df: the pandas dataframe where column is.
+        we'll take to create the dummy
+        - df: the pandas dataframe where column is
     Output: nothing. Modifies the df directly.
     '''
 
