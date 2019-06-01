@@ -15,6 +15,13 @@ FEATURES = ['poverty-rate', 'median-gross-rent', 'median-household-income', \
 YEARS_LIST = [2012, 2013, 2014, 2015, 2016, (2012, 2015)]
 Q = 5
 
+'''Dataframe new feature names format
+attribute_year_#quantiles_categorical
+attribute_year_#quantiles_#q
+attribute_#quantiles_categorical
+attribute_#quantiles_#q
+'''
+
 
 #############################
 # READ AND PRE-PROCESS DATA #
