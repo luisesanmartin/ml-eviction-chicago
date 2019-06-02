@@ -706,6 +706,7 @@ def evaluation_table(classifiers, parameters, datasets, fractions, \
                 # Progress reporting
                 print('\nRunning model', i, 'out of', total)
                 print('Progress:', round(i/total*100, 1), '%')
+                print('Classifier:', classifier)
                 i += 1
 
                 # Estimating models and metrics
