@@ -1,3 +1,4 @@
+import time
 import pandas as pd
 import numpy as np
 import warnings
@@ -666,6 +667,9 @@ def evaluation_table(classifiers, parameters, datasets, fractions, \
     Output: a Pandas dataframe - the evaluation table
     '''
 
+    # Time stamp:
+    begin = time.time()
+    
     # Generating the df
     precision_cols = ['precision_at_' + str(i) for i in fractions]
     recall_cols = ['recall_at_' + str(i) for i in fractions]
@@ -723,4 +727,10 @@ def evaluation_table(classifiers, parameters, datasets, fractions, \
                                    recall_metrics + \
                                    [area_under_curve(model, test_X, test_y)]
     
+    # Time stamp
+    end = time.time()
+    print('\nFinished!')
+    print('This job took', round((end-begin)/60, 1), 'minutes to run')
+    print('Good job!')
+
     return df
