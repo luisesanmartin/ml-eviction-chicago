@@ -73,7 +73,7 @@ PARAMETERS_LONG = \
  'Decision tree': {'max_depth': [1, 5, 10],
                    'criterion': ['gini', 'entropy'],
                    'min_samples_split': [10, 100, 1000]},
- 'Nearest neighbors': {'n_neighbors': [3, 10, 30],
+ 'Nearest neighbors': {'n_neighbors': [1, 3, 10],
                         'n_jobs': [10]}}
 
 
@@ -481,18 +481,10 @@ def simple_classifier(y_test):
 
     mean = y_test.mean()
 
-    if mean >= 0.5:
-        print("Predicting every data point's value to be 1, " + \
-              "the accuracy is", round(mean*100, 1), "%")
+    print("Predicting every data point's value to be 1, " + \
+          "the accuracy is", round(mean*100, 1), "%")
 
-        return mean
-
-    else:
-        acc = 1 - mean
-        print("Predicting every data point's value to be 0, " + \
-              "the accuracy is", round(acc*100, 1), "%")
-
-        return acc
+    return mean
 
 def accuracy(classifier, threshold, X_test, y_test):
     '''
