@@ -34,7 +34,6 @@ CLASSIFIERS = {'Gradient boosting': GradientBoostingClassifier,
                'Logistic regression': LogisticRegression,
                'Decision tree': DecisionTreeClassifier,
                'Nearest neighbors': KNeighborsClassifier}
-CLASSIFIERS_temp = {'Ada boosting': AdaBoostClassifier}
 
 PARAMETERS = \
 {'Gradient boosting': {'subsample': [1.0, 0.5, 0.2],
