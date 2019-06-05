@@ -280,17 +280,22 @@ Normalization = row value - min / (max-min)
 
 
 
-#################################
-# PREVIOUS YEAR'S EVICTION RATE #
-#################################
+##########################
+# PREVIOUS YEAR'S VALUES #
+##########################
 '''
-This section creates a new feature that adds the previous year's eviction rate for that block group.
+This section creates a new feature that adds the previous year's value for a given attribute 
+for that block group.
 '''
 
 def create_prev_yr_feature(df, feature):
     '''
+    Create new column with the previous year's value for given feature
+    For instance, if feature is 'evictions', will generate new column that shows evictions value for the
+    year previous for each row (GEOID)    
 
-    OUTPUT: df with added feature
+    INPUT: dataframe (df), column attribute (str) by which to grab previous year's value
+    OUTPUT: df with added features, name of new attribute generated
     '''
     years = df.year.value_counts().index.tolist()
     years.sort()
@@ -307,7 +312,7 @@ def create_prev_yr_feature(df, feature):
 
     mid_df = mid_df.astype(dtype={'GEOID':'int64', 'year':'int64'}) # b/c dataframe autotyped these as objects
     df = df.merge(mid_df, how='left')
-    return df
+    return df, col
 
 
 ####################
