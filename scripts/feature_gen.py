@@ -8,6 +8,7 @@ import os
 import sys
 from sys import version_info
 import pandas as pd
+import numpy as np
 
 
 FEATURES = ['poverty-rate', 'median-gross-rent', 'median-household-income', \
@@ -277,6 +278,37 @@ Create a list of data features that you want to scale, and loop over each to gen
 Normalization = row value - min / (max-min)
 '''
 
+
+
+#################################
+# PREVIOUS YEAR'S EVICTION RATE #
+#################################
+'''
+This section creates a new feature that adds the previous year's eviction rate for that block group.
+'''
+
+def create_prev_yr_function(df):
+    '''
+
+    OUTPUT: df with added feature
+    '''
+    years = df.year.value_counts().index.tolist()
+    years.sort()
+
+    col = 'prev-yr_eviction-rate'
+    mid_df = pd.DataFrame(columns=('GEOID', 'year', col))
+
+    for yr in years[1:]:
+        yr_df = df[df['year'] == yr][['year', 'GEOID']]
+        prev_yr_df = df[df['year'] == yr - 1][['GEOID', 'eviction-rate']]
+        yr_df = yr_df.merge(prev_yr_df) # Auto-merges on common col, GEOID
+        yr_df.rename(columns={'eviction-rate': col}, inplace=True)
+        mid_df = mid_df.append(yr_df, ignore_index=True)
+
+    mid_df = mid_df.astype(dtype={'GEOID':'int64', 'year':'int64'}) # b/c dataframe autotyped these as objects
+    df = df.merge(mid_df, how='left')
+
+    return df
 
 
 ####################
