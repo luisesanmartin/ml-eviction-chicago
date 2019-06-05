@@ -26,7 +26,8 @@ df = pipeline.read(file)
 # In[3]:
 
 
-years = [2013, 2014, 2015]
+#years = [2013, 2014, 2015]
+years = [2013]
 dic_sets = {}
 for year in years:
     next_year = year + 1
@@ -49,7 +50,7 @@ features = ['population_4quantiles_1.0', 'population_4quantiles_2.0', 'populatio
 
 # Defining the label:
 
-# In[10]:
+# In[6]:
 
 
 label = 'upper10th_by_year'
@@ -60,14 +61,16 @@ label = 'upper10th_by_year'
 # In[7]:
 
 
-fractions = [0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5]
-classifiers = pipeline.CLASSIFIERS
-parameters = pipeline.PARAMETERS_MID
+#fractions = [0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5]
+fractions = [0.01, 0.05, 0.1]
+#classifiers = pipeline.CLASSIFIERS
+classifiers = pipeline.CLASSIFIERS_temp
+parameters = pipeline.PARAMETERS
 
 
 # Creating the evaluation table:
 
-# In[11]:
+# In[ ]:
 
 
 evaluation_table = pipeline.evaluation_table(classifiers, parameters, dic_sets, fractions, features, label)
@@ -78,5 +81,5 @@ evaluation_table = pipeline.evaluation_table(classifiers, parameters, dic_sets, 
 # In[ ]:
 
 
-evaluation_table.to_csv('../outputs/evaluation_table.csv')
+#evaluation_table.to_csv('../outputs/evaluation_table.csv')
 
