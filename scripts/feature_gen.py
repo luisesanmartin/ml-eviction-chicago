@@ -135,8 +135,8 @@ def create_dummies(df, col_list):
     OUTPUTS: returns dataframe with dummy variables
     '''
     assert isinstance(col_list, list), "2nd argument must be a list of column names (as str) to transform"
-    rv = pd.get_dummies(df, dummy_na=True, columns=col_list) # drops original columns
-    return rv
+    df = pd.get_dummies(df, dummy_na=True, columns=col_list) # drops original columns
+    return df
 
 
 ########################
@@ -220,7 +220,7 @@ def generate_quantiles_and_dummies(df, attributes_list, q, year_var=None):
     quantile_features = []
     for attribute in attributes_list:
         # create_categorical_quantiles modifies df, but returns the colname of new feature
-        quant_feat_colname = create_categorical_quantiles(df, q, attribute, year_var)
+        df, quant_feat_colname = create_categorical_quantiles(df, q, attribute, year_var)
         quantile_features.append(quant_feat_colname)
 
     # When creating dummies, original column gets dropped
@@ -254,7 +254,7 @@ def create_categorical_quantiles(df, q, colname, suffix=None):
         # dealing with non-unique bin edges, but not dropping the duplicate bins
         # from: https://stackoverflow.com/questions/20158597/how-to-qcut-with-non-unique-bin-edges
         df[new_colname] = pd.qcut(df[colname].rank(method='first'), q, labels=labels)
-    return new_colname
+    return df, new_colname
 
 
 ######################
