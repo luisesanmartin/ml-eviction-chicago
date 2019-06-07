@@ -1,3 +1,24 @@
 /software/python-3.7.0-el7-x86_64/lib/python3.7/site-packages/sklearn/ensemble/weight_boosting.py:29: DeprecationWarning: numpy.core.umath_tests is an internal NumPy module and should not be imported. It will be removed in a future NumPy release.
   from numpy.core.umath_tests import inner1d
-slurmstepd-midway2-0013: error: *** JOB 60697652 ON midway2-0013 CANCELLED AT 2019-06-07T03:17:46 DUE TO TIME LIMIT ***
+Traceback (most recent call last):
+  File "ML-analysis.py", line 69, in <module>
+    evaluation_table = pipeline.evaluation_table(classifiers, parameters, dic_sets, fractions, features, label, metric)
+  File "../scripts/pipeline.py", line 734, in evaluation_table
+    graph = graph_models_best_average(df, preferred_metric)
+  File "../scripts/pipeline.py", line 761, in graph_models_best_average
+    graph = sns.lineplot(x='dataset', y=metric, data=plot_df, hue='classifier')
+  File "/home/lsanmartin/.local/lib/python3.7/site-packages/seaborn/relational.py", line 1082, in lineplot
+    ax = plt.gca()
+  File "/software/python-3.7.0-el7-x86_64/lib/python3.7/site-packages/matplotlib/pyplot.py", line 969, in gca
+    return gcf().gca(**kwargs)
+  File "/software/python-3.7.0-el7-x86_64/lib/python3.7/site-packages/matplotlib/pyplot.py", line 586, in gcf
+    return figure()
+  File "/software/python-3.7.0-el7-x86_64/lib/python3.7/site-packages/matplotlib/pyplot.py", line 533, in figure
+    **kwargs)
+  File "/software/python-3.7.0-el7-x86_64/lib/python3.7/site-packages/matplotlib/backend_bases.py", line 161, in new_figure_manager
+    return cls.new_figure_manager_given_figure(num, fig)
+  File "/software/python-3.7.0-el7-x86_64/lib/python3.7/site-packages/matplotlib/backends/_backend_tk.py", line 1046, in new_figure_manager_given_figure
+    window = Tk.Tk(className="matplotlib")
+  File "/software/python-3.7.0-el7-x86_64/lib/python3.7/tkinter/__init__.py", line 2020, in __init__
+    self.tk = _tkinter.create(screenName, baseName, className, interactive, wantobjects, useTk, sync, use)
+_tkinter.TclError: no display name and no $DISPLAY environment variable
