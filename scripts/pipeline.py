@@ -36,6 +36,9 @@ CLASSIFIERS = {'Gradient boosting': GradientBoostingClassifier,
                'Decision tree': DecisionTreeClassifier,
                'Nearest neighbors': KNeighborsClassifier}
 
+CLASSIFIERS_small = {'Logistic regression': LogisticRegression,
+               'Decision tree': DecisionTreeClassifier}
+
 PARAMETERS_small = \
 {'Gradient boosting': {'subsample': [0.5, 0.2],
                        'max_depth': [1, 5],
@@ -659,7 +662,7 @@ def evaluation_table(classifiers, parameters, datasets, fractions, features, lab
                      recall will be evaluated
         - features: the list of features we want to use for all models
         - label: the label we want to use for all models
-        - prefered_metric: the metric we will use to determine the best model
+        - preferred_metric: the metric we will use to determine the best model
                            for each classifier
 
 
@@ -728,7 +731,7 @@ def evaluation_table(classifiers, parameters, datasets, fractions, features, lab
                                    [area_under_curve(model, test_X, test_y)]
 
     df.to_csv('../outputs/evaluation_table.csv')
-    graph = graph_models_best_average(df, prefered_metric)
+    graph = graph_models_best_average(df, preferred_metric)
     graph.figure.savefig('../outputs/selected_models.png')
     
     # Time stamp
@@ -774,6 +777,6 @@ def model_best_average(df, metric):
         perf_metric = grouped_df[metric].iloc[0]
         if perf_metric > best_metric:
             best_metric = perf_metric
-            best_model = model
+            best_model = eval(model)
 
     return best_model, best_metric

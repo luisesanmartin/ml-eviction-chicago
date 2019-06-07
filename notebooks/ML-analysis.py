@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[12]:
+# In[1]:
 
 
-get_ipython().run_line_magic('load_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
+get_ipython().magic('load_ext autoreload')
+get_ipython().magic('autoreload 2')
 import sys
 sys.path.insert(0, '../scripts')
 import pipeline
@@ -75,7 +75,7 @@ evaluation_table = pipeline.evaluation_table(classifiers, parameters, dic_sets, 
 
 # Creating an object with the best model and best metric:
 
-# In[ ]:
+# In[8]:
 
 
 model, metric = pipeline.model_best_average(evaluation_table, metric)
@@ -83,7 +83,7 @@ model, metric = pipeline.model_best_average(evaluation_table, metric)
 
 # Generating parameters for the final outcome of our analysis:
 
-# In[8]:
+# In[9]:
 
 
 year_train = 2016
@@ -94,14 +94,14 @@ train_y_final = df[df['year']==year_train][label]
 
 # Generating the final prediction dataset:
 
-# In[9]:
+# In[10]:
 
 
 el_features = ['population_4quantiles_1.0', 'population_4quantiles_2.0', 'population_4quantiles_3.0',             'population_4quantiles_4.0', 'poverty-rate_4quantiles_1.0', 'poverty-rate_4quantiles_2.0',             'poverty-rate_4quantiles_3.0', 'poverty-rate_4quantiles_4.0',             'renter-occupied-households_4quantiles_1.0', 'renter-occupied-households_4quantiles_2.0',             'renter-occupied-households_4quantiles_3.0', 'renter-occupied-households_4quantiles_4.0',             'pct-renter-occupied_4quantiles_1.0', 'pct-renter-occupied_4quantiles_2.0',             'pct-renter-occupied_4quantiles_3.0', 'pct-renter-occupied_4quantiles_4.0',             'median-gross-rent_4quantiles_1.0', 'median-gross-rent_4quantiles_2.0',             'median-gross-rent_4quantiles_3.0', 'median-gross-rent_4quantiles_4.0',             'median-gross-rent_4quantiles_nan', 'median-household-income_4quantiles_1.0',             'median-household-income_4quantiles_2.0', 'median-household-income_4quantiles_3.0',             'median-household-income_4quantiles_4.0', 'median-household-income_4quantiles_nan',             'median-property-value_4quantiles_1.0', 'median-property-value_4quantiles_2.0',             'median-property-value_4quantiles_3.0', 'median-property-value_4quantiles_4.0',             'median-property-value_4quantiles_nan', 'rent-burden_4quantiles_1.0',             'rent-burden_4quantiles_2.0', 'rent-burden_4quantiles_3.0', 'rent-burden_4quantiles_4.0',             'rent-burden_4quantiles_nan', 'pct-white_4quantiles_1.0', 'pct-white_4quantiles_2.0',             'pct-white_4quantiles_3.0', 'pct-white_4quantiles_4.0', 'pct-af-am_4quantiles_1.0',             'pct-af-am_4quantiles_2.0', 'pct-af-am_4quantiles_3.0', 'pct-af-am_4quantiles_4.0',             'pct-hispanic_4quantiles_1.0', 'pct-hispanic_4quantiles_2.0', 'pct-hispanic_4quantiles_3.0',             'pct-hispanic_4quantiles_4.0', 'pct-am-ind_4quantiles_1.0', 'pct-am-ind_4quantiles_2.0',             'pct-am-ind_4quantiles_3.0', 'pct-am-ind_4quantiles_4.0', 'pct-asian_4quantiles_1.0',             'pct-asian_4quantiles_2.0', 'pct-asian_4quantiles_3.0', 'pct-asian_4quantiles_4.0',             'pct-nh-pi_4quantiles_1.0', 'pct-nh-pi_4quantiles_2.0', 'pct-nh-pi_4quantiles_3.0',             'pct-nh-pi_4quantiles_4.0', 'pct-multiple_4quantiles_1.0', 'pct-multiple_4quantiles_2.0',             'pct-multiple_4quantiles_3.0', 'pct-multiple_4quantiles_4.0', 'pct-other_4quantiles_1.0',             'pct-other_4quantiles_2.0', 'pct-other_4quantiles_3.0', 'pct-other_4quantiles_4.0',             'eviction-filings_4quantiles_1.0', 'eviction-filings_4quantiles_2.0',             'eviction-filings_4quantiles_3.0', 'eviction-filings_4quantiles_4.0',             'eviction-filing-rate_4quantiles_1.0', 'eviction-filing-rate_4quantiles_2.0',             'eviction-filing-rate_4quantiles_3.0', 'eviction-filing-rate_4quantiles_4.0',             'evictions_4quantiles_1.0', 'evictions_4quantiles_2.0',             'evictions_4quantiles_3.0', 'evictions_4quantiles_4.0',             'eviction-rate_4quantiles_1.0', 'eviction-rate_4quantiles_2.0',             'eviction-rate_4quantiles_3.0', 'eviction-rate_4quantiles_4.0',             'evictions-effectiveness_4quantiles_1.0', 'evictions-effectiveness_4quantiles_2.0',             'evictions-effectiveness_4quantiles_3.0', 'evictions-effectiveness_4quantiles_4.0']
 acs_features = ['total_for_public_assistance_income_4quantiles_1.0',             'total_for_public_assistance_income_4quantiles_2.0',             'total_for_public_assistance_income_4quantiles_3.0',             'total_for_public_assistance_income_4quantiles_4.0',             'with_public_assistance_income_4quantiles_1.0', 'with_public_assistance_income_4quantiles_2.0',             'with_public_assistance_income_4quantiles_3.0', 'with_public_assistance_income_4quantiles_4.0',             'estimate_total_in_labor_force_4quantiles_1.0', 'estimate_total_in_labor_force_4quantiles_2.0',             'estimate_total_in_labor_force_4quantiles_3.0', 'estimate_total_in_labor_force_4quantiles_4.0',             'estimate_civilian_unemployed_4quantiles_1.0', 'estimate_civilian_unemployed_4quantiles_2.0',             'estimate_civilian_unemployed_4quantiles_3.0', 'estimate_civilian_unemployed_4quantiles_4.0',             'total_for_householder_tenure_4quantiles_1.0', 'total_for_householder_tenure_4quantiles_2.0',             'total_for_householder_tenure_4quantiles_3.0', 'total_for_householder_tenure_4quantiles_4.0',             'renter_occupied_4quantiles_1.0', 'renter_occupied_4quantiles_2.0',             'renter_occupied_4quantiles_3.0', 'renter_occupied_4quantiles_4.0',             'renter_moved_2015/2010_later_4quantiles_1.0', 'renter_moved_2015/2010_later_4quantiles_2.0',             'renter_moved_2015/2010_later_4quantiles_3.0', 'renter_moved_2015/2010_later_4quantiles_4.0',             'renter_moved_2010-2014/2000-2009_4quantiles_1.0', 'renter_moved_2010-2014/2000-2009_4quantiles_2.0',             'renter_moved_2010-2014/2000-2009_4quantiles_3.0', 'renter_moved_2010-2014/2000-2009_4quantiles_4.0',             'renter_moved_2000-2009/1990-1999_4quantiles_1.0', 'renter_moved_2000-2009/1990-1999_4quantiles_2.0',             'renter_moved_2000-2009/1990-1999_4quantiles_3.0', 'renter_moved_2000-2009/1990-1999_4quantiles_4.0',             'renter_moved_1990-1999/1980-1989_4quantiles_1.0', 'renter_moved_1990-1999/1980-1989_4quantiles_2.0',             'renter_moved_1990-1999/1980-1989_4quantiles_3.0', 'renter_moved_1990-1999/1980-1989_4quantiles_4.0',             'renter_moved_1980-1989/1970-1979_4quantiles_1.0', 'renter_moved_1980-1989/1970-1979_4quantiles_2.0',             'renter_moved_1980-1989/1970-1979_4quantiles_3.0', 'renter_moved_1980-1989/1970-1979_4quantiles_4.0',             'renter_moved_1979/1969_earlier_4quantiles_1.0', 'renter_moved_1979/1969_earlier_4quantiles_2.0',             'renter_moved_1979/1969_earlier_4quantiles_3.0', 'renter_moved_1979/1969_earlier_4quantiles_4.0']
 
 
-# In[37]:
+# In[11]:
 
 
 acs_2017 = pipeline.read('../data/raw/block-groups_2017_acs-only.csv')
@@ -112,7 +112,7 @@ for col in el_features:
 df_2017 = df_2017.merge(acs_2017, on=('GEOID', 'year'), how='left')
 
 
-# In[77]:
+# In[12]:
 
 
 predict_X_final = df_2017[features]
@@ -122,7 +122,7 @@ df_2017['final_predictions'] = predictions
 df_2017.to_csv('../outputs/final_predictions.csv')
 
 
-# In[102]:
+# In[13]:
 
 
 with open("../outputs/final_model.txt", "w") as text_file:
