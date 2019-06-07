@@ -4,6 +4,7 @@ import numpy as np
 import warnings
 import matplotlib.pyplot as plt
 import sklearn.tree as tree
+import seaborn as sns
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
@@ -34,6 +35,39 @@ CLASSIFIERS = {'Gradient boosting': GradientBoostingClassifier,
                'Logistic regression': LogisticRegression,
                'Decision tree': DecisionTreeClassifier,
                'Nearest neighbors': KNeighborsClassifier}
+
+PARAMETERS_small = \
+{'Gradient boosting': {'subsample': [0.5, 0.2],
+                       'max_depth': [1, 5],
+                       'n_estimators': [50, 100],
+                       'max_features': [0.2, 1/3],
+                       'learning_rate': [0.1, 0.25]},
+ 'Ada boosting': {'base_estimator': [DecisionTreeClassifier(max_depth=5, criterion='entropy')],
+                  'n_estimators': [30, 50],
+                  'learning_rate': [0.5, 0.1]},
+ 'Bagging': {'base_estimator': [SVC(C=1.0, kernel='linear'),
+                             DecisionTreeClassifier(max_depth=5, criterion='gini'),
+                             LogisticRegression(C=1.0, penalty='l1')],
+             'n_estimators': [10, 100],
+             'max_samples': [1/3],
+             'max_features': [1/5, 1/3],
+             'n_jobs': [10]},
+ 'Random forest': {'n_estimators': [100, 1000],
+                   'criterion': ['gini'],
+                   'max_features': [0.1, 0.2],
+                   'n_jobs': [10]},
+ 'SVC': {'C': [0.001, 0.01, 0.1, 1, 10],
+         'kernel': ['linear', 'rbf']},
+ 'Linear SVC': {'C': [0.001, 0.01, 0.1, 1, 10],
+                            'penalty': ['l1', 'l2'],
+                            'dual': [False]},
+ 'Logistic regression': {'C': [0.001, 0.01, 0.1, 1, 10],
+                         'penalty': ['l1', 'l2']},
+ 'Decision tree': {'max_depth': [1, 5, 10, 20, 50],
+                   'criterion': ['gini', 'entropy'],
+                   'min_samples_split': [5, 10, 50, 100]},
+ 'Nearest neighbors': {'n_neighbors': [1],
+                       'n_jobs': [10]}}
 
 PARAMETERS = \
 {'Gradient boosting': {'subsample': [1.0, 0.5, 0.2],
@@ -604,8 +638,7 @@ def precision_recall_curves(classifier, X_test, y_test):
     
     return plt
 
-def evaluation_table(classifiers, parameters, datasets, fractions, \
-                     features, label):
+def evaluation_table(classifiers, parameters, datasets, fractions, features, label, preferred_metric):
     '''
     (Please notice that this function might take a while to run)
 
@@ -626,6 +659,9 @@ def evaluation_table(classifiers, parameters, datasets, fractions, \
                      recall will be evaluated
         - features: the list of features we want to use for all models
         - label: the label we want to use for all models
+        - prefered_metric: the metric we will use to determine the best model
+                           for each classifier
+
 
     Output: a Pandas dataframe - the evaluation table
     '''
@@ -685,10 +721,15 @@ def evaluation_table(classifiers, parameters, datasets, fractions, \
                                   for fraction in fractions]
 
                 # Appending results
-                df.loc[len(df)] = [str(clf), classifier, parameter, dataset,
+                size = len(df)
+                df.loc[size] = [str(clf), classifier, parameter, dataset,
                                    baseline] + precision_metrics + \
                                    recall_metrics + \
                                    [area_under_curve(model, test_X, test_y)]
+
+    df.to_csv('../outputs/evaluation_table.csv')
+    graph = graph_models_best_average(df, prefered_metric)
+    graph.figure.savefig('../outputs/selected_models.png')
     
     # Time stamp
     end = time.time()
@@ -696,4 +737,43 @@ def evaluation_table(classifiers, parameters, datasets, fractions, \
     print('This job took', round((end-begin)/60, 1), 'minutes to run')
     print('Good job!')
 
+    #return df, best_models
     return df
+
+def graph_models_best_average(df, metric):
+    '''
+    '''
+    plot_df = pd.DataFrame(columns=['classifier', 'dataset', metric])
+    sets = df['dataset'].unique()
+    for classifier in df['classifier'].unique():
+        temp_df = df[df['classifier']==classifier][['Exact classifier', 'classifier', 'dataset', metric]]
+        grouped_df = temp_df.groupby(['Exact classifier', 'classifier']).mean().\
+                     sort_values(by=[metric], ascending=False)
+        model = grouped_df.index[0][0]
+
+        for dataset in sets:
+            perf_metric = temp_df[temp_df['Exact classifier']==model][temp_df['dataset']==dataset][metric].values[0]
+            plot_df.loc[len(plot_df)] = classifier, dataset, perf_metric
+
+    graph = sns.lineplot(x='dataset', y=metric, data=plot_df, hue='classifier')
+    
+    return graph
+
+def model_best_average(df, metric):
+    '''
+    '''
+    #plot_df = pd.DataFrame(columns=['classifier', 'dataset', metric])
+    #sets = df['dataset'].unique()
+    best_metric = 0
+    best_model = None
+    for classifier in df['classifier'].unique():
+        temp_df = df[df['classifier']==classifier][['Exact classifier', 'classifier', 'dataset', metric]]
+        grouped_df = temp_df.groupby(['Exact classifier', 'classifier']).mean().\
+                     sort_values(by=[metric], ascending=False)
+        model = grouped_df.index[0][0]
+        perf_metric = grouped_df[metric].iloc[0]
+        if perf_metric > best_metric:
+            best_metric = perf_metric
+            best_model = model
+
+    return best_model, best_metric
