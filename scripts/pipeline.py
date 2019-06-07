@@ -2,6 +2,8 @@ import time
 import pandas as pd
 import numpy as np
 import warnings
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import sklearn.tree as tree
 import seaborn as sns
