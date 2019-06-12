@@ -1,10 +1,18 @@
-# ml-eviction-chicago
-Repository for our ML project on eviction rates across Chicago
+# Evictions in Cook County
+Welcome to our repository! It contains all the files we used and generated in our project. We used a supervised learning approach to predict the block groups of the Cook Country (Illinois) at the most risk of having the highest number of evictions.
 
 Collaborators:
 
-Jessica Langston
+* Jessica Langston
+* Liza Marie Soriano
+* Luis Eduardo "Luise" San Martin
 
-Liza Marie Soriano
+Folders and files:
 
-Luis Eduardo "Luise" San Martin
+* **README.md**: The present readme file
+* **data**: The folder that contains all the data files we used for this project
+* **notebooks**:The Jupyter Noebooks we used
+* **scripts**: Te Python scripts with the functions we created
+* **submissions**: All the files we submitted for the assignments and progress reports related to this project
+
+Each folder contains their own README.md files further explaining their contents.
