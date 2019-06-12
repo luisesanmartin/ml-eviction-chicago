@@ -28,6 +28,7 @@ from sklearn.model_selection import ParameterGrid
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings("ignore", category=Warning)
 
+# Our list of classifiers
 CLASSIFIERS = {'Gradient boosting': GradientBoostingClassifier,
                'Ada boosting': AdaBoostClassifier,
                'Bagging': BaggingClassifier,
@@ -38,9 +39,11 @@ CLASSIFIERS = {'Gradient boosting': GradientBoostingClassifier,
                'Decision tree': DecisionTreeClassifier,
                'Nearest neighbors': KNeighborsClassifier}
 
+# Small list of classifiers -- used to check if the code was running properly
 CLASSIFIERS_small = {'Logistic regression': LogisticRegression,
                'Decision tree': DecisionTreeClassifier}
 
+# Small list of parameters -- used to check if the code was running properly
 PARAMETERS_small = \
 {'Gradient boosting': {'subsample': [0.5, 0.2],
                        'max_depth': [1, 5],
@@ -82,6 +85,7 @@ PARAMETERS_small = \
  'Nearest neighbors': {'n_neighbors': [1],
                        'n_jobs': [10]}}
 
+# Our final list of parameters
 PARAMETERS = \
 {'Gradient boosting': {'subsample': [1.0, 0.5, 0.2],
                        'max_depth': [1, 5, 10, 20, 50],
@@ -147,337 +151,6 @@ def read(csv_file):
     '''
 
     return pd.read_csv(csv_file)
-
-def columns_list(df):
-    '''
-    Prints a list of the columns of a dataframe. No output is returned.
-
-    Inputs:
-        - df: Pandas dataframe
-    '''
-
-    print(df.columns)
-
-def count_obs(df):
-    '''
-    Prints the number of observations (rows) in a dataframe.
-
-    Inputs:
-        - df: Pandas dataframe
-    '''
-
-    print(len(df))
-
-def columns_types(df):
-    '''
-    Prints the type of all columns in a dataframe.
-
-    Inputs:
-        - df: Pandas dataframe
-    '''
-
-    print(df.dtypes)
-
-def count_missings(df):
-    '''
-    Prints the percentage of missing data points in each column of a dataframe.
-
-    Inputs:
-        - df: Pandas dataframe
-    '''
-
-    total = len(df)
-    for col in df.columns:
-        print(col, 'has', df[col].isna().sum() / total * 100, \
-            '% of missing data points')
-
-def tabulate(df, col):
-    '''
-    Tabulates the column (col) of a dataframe (df), and prints the result.
-
-    Inputs:
-        - df: Pandas dataframe
-        - col: The column we want to tabulate
-    '''
-
-    print(df.groupby(col).size())
-
-def correlations(df):
-    '''
-    Prints the correlation table of all the columns in a dataframe.
-
-    Inputs:
-        - df: Pandas dataframe
-    '''
-
-    df.corr().style.background_gradient(cmap='coolwarm')
-
-def histograms(df):
-    '''
-    Prints a histogram of every column in a dataframe.
-
-    Inputs:
-        - df: Pandas dataframe
-    '''
-
-    df.hist(figsize=(20, 20))
-
-def describe(df):
-    '''
-    Prints some descriptive statistics of all the columns of a dataframe.
-
-    Inputs:
-        - df: Pandas dataframe
-    '''
-
-    for col in df.columns:
-        print(df[col].describe())
-
-def duplicates(df):
-    '''
-    Prints the number of duplicated observations (all-columns-duplicates)
-    in a dataframe.
-
-    Inputs:
-        - df: Pandas dataframe
-    '''
-
-    dups = df[df.duplicated(keep=False)]
-    print(len(dups))
-
-def duplicates_in_columns(df, columns):
-    '''
-    Prints the number of observations with the same values for a certain
-    group of columns in a dataframe.
-
-    Inputs:
-        - df: Pandas dataframe
-        - columns: a group of columns in the dataframe.
-    '''
-
-    dups = df[df.duplicated(columns, keep=False)]
-    print(len(dups))
-
-def create_time_label(df, date1_col, date2_col, n_days):
-    '''
-    Creates a dummy column named 'label' indicating if the value of
-    date2_col is higher than date1_col + n_days.
-
-    Inputs:
-        - df: the Pandas dataframe we are using
-        - date1_col: a date type column
-        - date2_col: another date type column
-        - n_days: the number of days we use to create the label
-
-    Output: nothing, just modifies the df directly.
-    '''
-
-    days = pd.DateOffset(days=n_days)
-
-    df['label'] = np.where(df[date2_col] > df[date1_col] + days, 1, 0)
-
-def time_based_split(df, time_col, date_threshold, gap_days, months_range):
-    '''
-    Generates and returns a train and a test dataframe based on a time split
-    and a gap period.
-
-    Inputs:
-        - df: the Pandas dataframe we want to generate the new dataframes from
-        - time_col: the time column we will use from df for the time split
-        - date_threshold: the date which will divide the train and test
-                          dataframes
-        - gap_days: the number of days we use for a gap period before the
-                    date threhold
-        - months_range: the number of months we want our test dataset to span
-
-    Outputs:
-        - df_train: the training dataset, based on the split. It consists of
-                    all data point where time_col is equal or lower than
-                    date_threshold minus gap_days
-        - df_test: the testing dataset. It has all observations where time_col
-                   is higher than date_threshold and equal or lower than
-                   date_threshold plus months_range
-    '''
-
-    gap = pd.DateOffset(days=gap_days)
-    months = pd.DateOffset(months=months_range)
-    date_split = pd.to_datetime(date_threshold)
-
-    train_upper_threshold = date_split - gap
-    test_upper_threshold = date_split + months
-
-    df_train = df[df[time_col]<=train_upper_threshold]
-    df_test = df[(df[time_col]>date_split) \
-              & (df[time_col]<=test_upper_threshold)]
-
-    print('train upper threshold:', train_upper_threshold)
-    print('Notice that we leave a gap of', gap_days, 'days')
-    print('test lower threshold:', date_split)
-    print('test upper threshold:', test_upper_threshold)
-
-    return df_train, df_test
-
-def to_date(df, column):
-    '''
-    Transforms a column (column) of a dataframe (df) in date type.
-
-    Inputs:
-        - column (column of a pandas dataframe): the column whose type
-        we want to replace
-        - df: the pandas dataframe where column is
-
-    Output: nothing. Modifies the df directly.
-    '''
-
-    df[column] = pd.to_datetime(df[column], infer_datetime_format=True)
-
-def discrete_0_1(df, column, value0, value1):
-    '''
-    Replaces the value provided in 'value0' for 0 and the value of 'value1'
-    for 1. Then transforms the column to a numeric type.
-
-    Inputs:
-        - df: the pandas dataframe we want to modify
-        - column: the columns whose values we want to replace
-        - value0: the value we should replace for zeros
-        - value1: the value we should replace for ones
-
-    Output: nothing. Modifies the df directly.
-    '''
-
-    df[column] = df[column].replace(value0, 0)
-    df[column] = df[column].replace(value1, 1)
-    df[column] = pd.to_numeric(df[column])
-
-def fill_nas_other(df, column, label):
-    '''
-    Fills the NaN values of a column (column) in a dataframe (df) with
-    the value provided (label).
-
-    Inputs:
-        - column (column of a pandas dataframe): the column whose NaN
-        values we want to fill in. It should be a variable
-        included in df
-        - df: the pandas dataframe where column is and where we'll replace
-        the NaN values
-
-    Output: nothing. Modifies the df directly.
-    '''
-
-    df[column] = df[column].fillna(value=label)
-
-def fill_nas_mode(df, column):
-    '''
-    Fills the NaN values of a column (column) in a dataframe (df) with
-    the value of the column mode.
-
-    Inputs:
-        - column (column of a pandas dataframe): the column whose NaN
-        values we want to fill in with the mode. It should be a variable
-        included in df
-        - df: the pandas dataframe where column is and where we'll replace
-        the NaN values
-
-    Output: nothing. Modifies the df directly.
-    '''
-
-    mode = df[column].mode().iloc[0]
-    df[column] = df[column].fillna(value=mode)
-
-def fill_nas_median(df, column):
-    '''
-    Replaces the NaN values of a column (column) in a dataframe (df) with
-    the value of the column median
-
-    Inputs:
-        - column (column of a pandas dataframe): the column whose NaN
-        values we want to fill in with the median. It should be a variable
-        included in df.
-        - df: the pandas dataframe where column is and where we'll replace
-        the NaN values.
-
-    Output: nothing. Modifies the df directly.
-    '''
-
-    median = df[column].quantile()
-    df[column] = df[column].fillna(value=median)
-
-def discretize(df, column):
-    '''
-    Creates in the dataframe provided dummy variables indicating that an
-    observation belongs to a certain quartile of the column provided.
-    Each dummy has the name of the column + a number indicating the quartile.
-
-    Inputs:
-        - column (column of a pandas dataframe): the column we want to
-        discretize. It should be a continuous variable included in df.
-        - df: the pandas dataframe where column is and where we'll add
-        the new dummy variables.
-
-    Output: nothing. Modifies the df directly.
-    '''
-    N_SUBSETS = 4
-    WIDE = 1 / N_SUBSETS
-    
-    xtile = 0
-    col = df[column]
-
-    for i in range(1, N_SUBSETS + 1):
-
-        mini = col.quantile(xtile)
-        maxi = col.quantile(xtile + WIDE)
-        df.loc[(df[column] >= mini) & (df[column] <= maxi), \
-               column + '_quartile'] = i
-        xtile += WIDE
-
-def create_dummies(df, column):
-    '''
-    Takes a dataframe (df) and a categorical variable in it (column) and
-    creates a dummy for each distinct value of the input categorical
-    variable.
-
-    Inputs:
-        - column (column of a pandas dataframe): the column we want to
-        discretize. It should be a categorical variable included in df.
-        - df: the pandas dataframe where column is and where we'll add
-        the new dummy variables
-    Output: nothing. Modifies the df directly.       
-    '''
-
-    for value in df[column].unique():
-
-        df.loc[df[column] == value, column + '_' + str(value)] = 1
-        df.loc[df[column] != value, column + '_' + str(value)] = 0
-
-def replace_over_one(df, column):
-    '''
-    Takes a dataframe (df) and a variable in it (column) and replaces
-    the values over one with ones.
-
-    Inputs:
-        - column (column of a pandas dataframe): the column whose values
-        over one we will replace with ones.
-        - df: the pandas dataframe where column is.
-    Output: nothing. Modifies the df directly.
-    '''
-
-    df.loc[df[column] > 1, column] = 1
-
-def discretize_over_zero(df, column):
-    '''
-    Takes a dataframe (df) and a variable in it (column) and creates a
-    dummy indicating the observations that have a value higher than
-    zero.
-
-    Inputs:
-        - column (column of a pandas dataframe): the column whose values
-        we'll take to create the dummy.
-        - df: the pandas dataframe where column is.
-    Output: nothing. Modifies the df directly.
-    '''
-
-    df.loc[df[column] == 0, column + '_over_zero'] = 0
-    df.loc[df[column] > 0, column + '_over_zero'] = 1
 
 def get_predictions(classifier, X_test):
     '''
@@ -668,6 +341,11 @@ def evaluation_table(classifiers, parameters, datasets, fractions, features, lab
     and each column is a model performance indicator. Each classifier
     is evaluated on the same features and the same label.
 
+    It also exports that dataframe as a csv file with the name 
+    'evaluation_table.csv' and generates a graph of the models with the
+    best average preferred metric for each type of classifier with the 
+    name 'selected_models.png'.
+
     Inputs:
         - classifiers: a dictionary with the (untrained) classifiers 
                        we want to use
@@ -683,7 +361,6 @@ def evaluation_table(classifiers, parameters, datasets, fractions, features, lab
         - label: the label we want to use for all models
         - preferred_metric: the metric we will use to determine the best model
                            for each classifier
-
 
     Output: a Pandas dataframe - the evaluation table
     '''
@@ -764,6 +441,19 @@ def evaluation_table(classifiers, parameters, datasets, fractions, features, lab
 
 def graph_models_best_average(df, metric):
     '''
+    Evaluates the input dataframe (df), which is a table where each row
+    is a classifier from and each column is a model performance indicator
+    (the output returned in evaluation_table). Then it uses the metric
+    provided as input (metric) to determine the model with the best
+    average metric for each classifier, and graphs each one of those best
+    models by classifier to show their performance in the selected metric.
+
+    Inputs:
+        - df: 
+        - metric: the metric we will use to determine the best model
+                  for each classifier
+
+    Output: graph object
     '''
     plot_df = pd.DataFrame(columns=['classifier', 'dataset', metric])
     sets = df['dataset'].unique()
@@ -783,17 +473,31 @@ def graph_models_best_average(df, metric):
 
 def model_best_average(df, metric):
     '''
+    Evaluates the input dataframe (df), which is a table where each row
+    is a classifier from and each column is a model performance indicator
+    (the output returned in evaluation_table). Then it uses the metric
+    provided as input (metric) to determine the model with the best average
+    metric, and returns that model and the average value of its best metric.
+
+    Inputs:
+        - df: 
+        - metric: the metric we will use to determine the best model
+                  for each classifier
+
+    Output: graph object
     '''
-    #plot_df = pd.DataFrame(columns=['classifier', 'dataset', metric])
-    #sets = df['dataset'].unique()
+
     best_metric = 0
     best_model = None
+
     for classifier in df['classifier'].unique():
+        
         temp_df = df[df['classifier']==classifier][['Exact classifier', 'classifier', 'dataset', metric]]
         grouped_df = temp_df.groupby(['Exact classifier', 'classifier']).mean().\
                      sort_values(by=[metric], ascending=False)
         model = grouped_df.index[0][0]
         perf_metric = grouped_df[metric].iloc[0]
+        
         if perf_metric > best_metric:
             best_metric = perf_metric
             best_model = eval(model)
