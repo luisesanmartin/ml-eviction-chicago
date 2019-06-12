@@ -1,4 +1,4 @@
-## Data folder
+## data
 
 Content:
 
