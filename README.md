@@ -11,9 +11,9 @@ Folders and files:
 
 * **README.md**: The present readme file
 * **data**: The folder that contains all the data files we used for this project
-* **notebooks**:The Jupyter Noebooks we used
+* **notebooks**: The Jupyter Noebooks we used
 * **outputs**: the final results files we generated in our analysis
-* **scripts**: Te Python scripts with the functions we created
+* **scripts**: The Python scripts with the functions we created
 * **submissions**: All the files we submitted for the assignments and progress reports related to this project
 
 Each folder contains their own README.md files further explaining their contents.
