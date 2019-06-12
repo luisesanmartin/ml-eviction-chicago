@@ -1,5 +1,8 @@
 # Evictions in Cook County
-Welcome to our repository! It contains all the files we used and generated in our project. We used a supervised learning approach to predict the block groups of the Cook Country (Illinois) at the most risk of having the highest number of evictions.
+
+Welcome to our repository!
+
+It contains all the files we used and generated in our project. We used a supervised learning approach to predict the block groups of the Cook Country (Illinois) at the most risk of having the highest number of evictions.
 
 Collaborators:
 
@@ -9,7 +12,6 @@ Collaborators:
 
 Folders and files:
 
-* **README.md**: The present readme file
 * **data**: The folder that contains all the data files we used for this project
 * **notebooks**: The Jupyter Noebooks we used
 * **outputs**: the final results files we generated in our analysis
